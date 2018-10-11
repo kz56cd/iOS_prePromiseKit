@@ -19,17 +19,19 @@ final class ViewController: UIViewController {
 extension ViewController {
     func testPromiseKit() {
         // NOTE: basic
-//        _ = Promise<String> { seal in
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//                    seal.fulfill("tada") // 次のブロックに値を渡す
-//                    print("1")
-//                }
-//            }.done { value in
-//                print("2")
-//                print(value)
-//                print("🙆‍♂️")
-//            }
-//        print("3")
+        _ = Promise<String> { seal in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    seal.fulfill("tada") // 次のブロックに値を渡す
+                    print("1")
+                }
+            }.done { value in
+                print("2")
+                print(value)
+                print("🙆‍♂️")
+            }.ensure { // .ensureは success / failure関わらず呼ばれる
+                print("ensure")
+                // .finallyも同じようなメソッド、ただし使える箇所は限定的
+            }
         
         // NOTE: use .then (複数非同期処理を順番に実行)
 //        _ = Promise<String> { seal in
@@ -60,29 +62,29 @@ extension ViewController {
 //            }
         
         // NOTE: when (複数処理を並列実行)
-        let promises = (0...3).map { i -> Promise<String> in
-            Promise<String> { seal in
-                DispatchQueue.main.asyncAfter(deadline: .now() + Double(i)) {
-                    if i == 2 {
-                        seal.reject(MyError.unknownerror)
-                    } else {
-                        seal.fulfill("DONE: \(i)")
-                    }
-                    print(i)
-                }
-            }
-        }
-        
-        when(resolved: promises).done { values in
-            values.forEach {
-                switch $0 {
-                case .fulfilled(let value):
-                    print(value)
-                case .rejected(let error):
-                    print(error)
-                }
-            }
-        }
+//        let promises = (0...3).map { i -> Promise<String> in
+//            Promise<String> { seal in
+//                DispatchQueue.main.asyncAfter(deadline: .now() + Double(i)) {
+//                    if i == 2 {
+//                        seal.reject(MyError.unknownerror)
+//                    } else {
+//                        seal.fulfill("DONE: \(i)")
+//                    }
+//                    print(i)
+//                }
+//            }
+//        }
+//
+//        when(resolved: promises).done { values in
+//            values.forEach {
+//                switch $0 {
+//                case .fulfilled(let value):
+//                    print(value)
+//                case .rejected(let error):
+//                    print(error)
+//                }
+//            }
+//        }
     }
 }
 
