@@ -18,16 +18,49 @@ final class ViewController: UIViewController {
 
 extension ViewController {
     func testPromiseKit() {
+        // NOTE: basic
+//        _ = Promise<String> { seal in
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                    seal.fulfill("tada") // 次のブロックに値を渡す
+//                    print("1")
+//                }
+//            }.done { value in
+//                print("2")
+//                print(value)
+//                print("🙆‍♂️")
+//            }
+//        print("3")
+        
+        // NOTE: use .then (複数非同期処理を順番に実行)
         _ = Promise<String> { seal in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    seal.fulfill("tada") // 次のブロックに値を渡す
-                    print("1")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    // seal.fulfill("Done!! 01")
+                    seal.reject(MyError.unknownerror) // errorを発生させる
+                    print(1)
+                }
+            }.then { result -> Promise<String> in
+                Promise<String> { seal in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                        print(2)
+                        seal.fulfill("Done!! 02")
+                    }
+                }
+            }.then { result -> Promise<String> in
+                Promise<String> { seal in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                        print(3)
+                        seal.fulfill("Done!! 03")
+                    }
                 }
             }.done { value in
-                print("2")
+                print(".done")
                 print(value)
-                print("🙆‍♂️")
+            }.catch { error in // 例外は .catch で定義できる
+                print(error.localizedDescription)
             }
-        print("3")
     }
+}
+
+enum MyError: Error {
+    case unknownerror
 }
