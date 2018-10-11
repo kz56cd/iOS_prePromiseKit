@@ -9,9 +9,25 @@
 import UIKit
 import PromiseKit
 
-class ViewController: UIViewController {
+final class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
+        testPromiseKit()
     }
 }
 
+extension ViewController {
+    func testPromiseKit() {
+        _ = Promise<String> { seal in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    seal.fulfill("tada") // 次のブロックに値を渡す
+                    print("1")
+                }
+            }.done { value in
+                print("2")
+                print(value)
+                print("🙆‍♂️")
+            }
+        print("3")
+    }
+}
